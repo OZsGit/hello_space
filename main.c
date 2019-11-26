@@ -4,7 +4,7 @@
 * Application name:	hello_space						*			
 * Filename:		main.c							*
 * Date:			26 November 2019					*
-* File Version:		0.2							*	
+* File Version:		0.3							*	
 *										*		
 * Author:		Ole Zhang						*
 * Company:		Odyssey Geophysics					*
@@ -15,8 +15,10 @@
 *										*
 *********************************************************************************
 *										*
-* Description:	Prints 'Hello, Space!' in the serial monitor once every 5 secs	*
-*	[detailed description]							*
+* Description:	Sends the message "Hello, Space!" every 8 hours 		*
+*	Attempts to send a predefined message every 8 hours unless the		*
+*	message queue is overloaded, in which case it will print out		*
+*	"Overloaded" in the serial monitor.					*
 *										*				
 *********************************************************************************
 *										*
@@ -28,12 +30,14 @@
 #include "myriota_user_api.h"
 
 time_t HelloSpace() { //the Job, called HelloSpace()
-   printf("Hello, Space!\n");
-return SecondsFromNow(5); //time_t SecondsFromNow(unsigned Secs)
+    const char message[] = "Hello, Space!";
+    if(ScheduleMessage((uint8_t *)message, sizeof(message)) > 1)
+	printf("Overloaded\n");
+    return HoursFromNow(8);
 }
 
 void AppInit() {
-   ScheduleJob(HelloSpace, ASAP()); 
+    ScheduleJob(HelloSpace, ASAP()); 
 	/*time_t ScheduleJob (ScheduledJob Job, time_t Time)
 	ScheduleJob has two arguments: 
 		Job: a task to perform. It has the signature:
